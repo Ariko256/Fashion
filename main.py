@@ -7,7 +7,6 @@ from ooth.authenticate import Auth
 from kivymd.toast import toast
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.floatlayout import MDFloatLayout
-import requests
 from requests.exceptions import HTTPError
 import json
 
