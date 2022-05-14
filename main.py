@@ -7,6 +7,8 @@ from ooth.authenticate import Auth
 from kivymd.toast import toast
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 from requests.exceptions import HTTPError
 import json
 
@@ -20,6 +22,8 @@ def Toast_message(msg):
     return toast(text=f"{msg}", background=(77 / 255, 77 / 255, 77 / 255, 1))
 
 
+
+
 class Tab(MDFloatLayout, MDTabsBase):
     pass
 
@@ -31,6 +35,16 @@ class FashionApp(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = 'Pink'
         self.theme_cls.primary_hue = '500'
+    
+    def show_dialog(self,msg):
+        self.dialog = MDDialog(
+            text=msg,
+            buttons=[],
+        )
+        self.dialog.open()
+
+   
+
 
     def build(self):
         pass
@@ -66,26 +80,27 @@ class FashionApp(MDApp):
 
                 if (len(passwd.text) >= int(6)):
                     try:
-                        user = auth.create_user_with_email_and_password(email.text, passwd.text)
+                        user = auth.create_user_with_email_and_password(
+                            email.text, passwd.text)
                         Toast_message(f"user {email.text} has been created")
                         user = auth.sign_in_with_email_and_password(
                             email.text, passwd.text
                         )
                         auth.send_email_verification(user['idToken'])
-                        
+
                         email.text = ""
                         passwd.text = ""
                         confirm_passwd.text = ""
-                        
 
                     except HTTPError as e:
                         err = e.strerror
                         err_mod = json.loads(err)
                         print(err_mod["error"]["message"])
-                        Toast_message(err_mod["error"]["message"])
+                        self.show_dialog(err_mod["error"]["message"])
 
                 else:
-                    Toast_message("password should be atleast 6 characters long  and should contain symbols")
+                    Toast_message(
+                        "password should be atleast 6 characters long  and should contain symbols")
                     passwd.text = ""
                     confirm_passwd.text = ""
 
@@ -107,21 +122,20 @@ class FashionApp(MDApp):
         if email.text != "" and password.text != "":
 
             try:
-                signin = auth.sign_in_with_email_and_password(email.text, password.text)
-                
+                signin = auth.sign_in_with_email_and_password(
+                    email.text, password.text)
+
                 self.root.current = "home_screen"
                 Toast_message("Signed in succesfully")
                 email.text = ""
                 password.text = ""
 
-
-            
             except HTTPError as e:
                 err = e.strerror
                 err_mod = json.loads(err)
                 print(err_mod["error"]["message"])
-                Toast_message(err_mod["error"]["message"])
-
+                self.show_dialog(err_mod["error"]["message"])
+                # Toast_message(err_mod["error"]["message"])
 
         else:
             Toast_message("Fill in the blanks")
